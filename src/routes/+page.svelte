@@ -361,6 +361,8 @@
 				{/each}
 
 				{#each nodes as node (node.id)}
+					{@const radius = node.type === 'situation' ? 76 : 58}
+					{@const textBox = radius * 1.55}
 					<g
 						role="button"
 						tabindex="0"
@@ -373,16 +375,25 @@
 						<circle
 							cx={node.x}
 							cy={node.y}
-							r={node.type === 'situation' ? 76 : 58}
+							r={radius}
 							class={`node ${node.type} ${selectedNode.id === node.id ? 'active' : ''}`}
 							filter="url(#shadow)"
 						/>
-						<text x={node.x} y={node.y - 5} class="node-type">
-							{typeLabels[node.type]}
-						</text>
-						<text x={node.x} y={node.y + 18} class="node-label">
-							{node.label}
-						</text>
+						<foreignObject
+							x={node.x - textBox / 2}
+							y={node.y - textBox / 2}
+							width={textBox}
+							height={textBox}
+						>
+							<div
+								xmlns="http://www.w3.org/1999/xhtml"
+								class="bubble-copy"
+								class:situation-copy={node.type === 'situation'}
+							>
+								<span class="bubble-type">{typeLabels[node.type]}</span>
+								<span class="bubble-label">{node.label}</span>
+							</div>
+						</foreignObject>
 					</g>
 				{/each}
 			</svg>
@@ -714,22 +725,53 @@
 		fill: #d2a5cc;
 	}
 
-	.node-type,
-	.node-label {
-		fill: white;
-		text-anchor: middle;
+	.bubble-copy {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		box-sizing: border-box;
+		width: 100%;
+		height: 100%;
+		padding: 18%;
+		overflow: hidden;
+		color: white;
+		text-align: center;
+		line-height: 1.2;
 		pointer-events: none;
+		font-family:
+			Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	}
 
-	.node-type {
-		font-size: 11px;
+	.bubble-type {
+		display: block;
+		margin-bottom: 4px;
+		font-size: 10px;
 		font-weight: 700;
+		letter-spacing: 0.01em;
 		opacity: 0.82;
 	}
 
-	.node-label {
-		font-size: 12px;
+	.bubble-label {
+		display: -webkit-box;
+		overflow: hidden;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		font-size: 11px;
 		font-weight: 800;
+		overflow-wrap: anywhere;
+		word-break: break-word;
+	}
+
+	.situation-copy .bubble-type {
+		font-size: 11px;
+	}
+
+	.situation-copy .bubble-label {
+		-webkit-line-clamp: 4;
+		line-clamp: 4;
+		font-size: 12px;
 	}
 
 	.next-actions {
